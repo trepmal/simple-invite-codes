@@ -37,7 +37,12 @@ add_action( 'register_form', 'ic_add_register_field' );
 /**
  * Verify invite code
  */
-function ic_add_register_field_validate( $sanitized_user_login, $user_email, $errors) {
+function ic_add_register_field_validate( $sanitized_user_login, $user_email, $errors ) {
+
+	// if there are other errors, do nothing with the invite code
+	if ( ! empty( $errors->errors ) ) {
+		return $errors;
+	}
 
 	// if code missing
 	if ( ! isset( $_POST['invite_code'] ) || empty( $_POST['invite_code'] ) ) {
