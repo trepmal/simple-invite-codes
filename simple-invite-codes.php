@@ -6,6 +6,11 @@ Author: Kailey Lampert
 Author URI: http://kaileylampert.com/
 */
 
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require 'cli/class-simple-invite-codes.php';
+	WP_CLI::add_command( 'sic', 'Simple_Invite_Codes' );
+}
+
 /**
  * Register post type
  */
