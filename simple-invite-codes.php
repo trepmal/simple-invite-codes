@@ -41,6 +41,13 @@ add_action( 'register_form', 'ic_add_register_field' );
 
 /**
  * Verify invite code
+ *
+ * @param string   $sanitized_user_login The submitted username after being sanitized.
+ * @param string   $user_email           The submitted email.
+ * @param WP_Error $errors               Contains any errors with submitted username and email,
+ *                                       e.g., an empty field, an invalid username or email,
+ *                                       or an existing username or email.
+ * @return WP_Error|void
  */
 function ic_add_register_field_validate( $sanitized_user_login, $user_email, $errors ) {
 
@@ -83,3 +90,25 @@ function ic_add_register_field_validate( $sanitized_user_login, $user_email, $er
 	}
 }
 add_action( 'register_post', 'ic_add_register_field_validate', 10, 3 );
+
+/**
+ * Mark unique titles (codes)
+ *
+ * Due to verification via `get_page_by_title`, duplicate codes
+ * are never usable.
+ * Mark as duplicate and set to draft.
+ *
+ * @param array $data    An array of slashed post data.
+ * @param array $postarr An array of sanitized, but otherwise unmodified post data.
+ * @return array An array of slashed post data.
+ */
+function ic_mark_duplicate_titles( $data, $postarr ) {
+	$title = $data['post_title'];
+	$code_exists = get_page_by_title( $title, OBJECT, 'invite_codes' );
+	if ( $code_exists ) {
+		$data['post_title'] .= '-duplicate';
+		$data['post_status'] = 'draft';
+	}
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'ic_mark_duplicate_titles', 10, 2 );
