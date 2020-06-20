@@ -33,3 +33,27 @@ Created code 21ed (ID: 27280)
 ```
 
 See `wp help sic generate` for information on each option.
+
+
+### Creating codes from a premade list
+
+Suppose you have a predetermined list of codes you'd like to import. I recommend using core WP-CLI commands to import them.
+
+For example, here's my `codes.txt` file, which contains 3 codes (they must each be on their own line):
+
+```
+specialcode1
+specialcode2
+specialcode3
+```
+
+I can then use this loop with WP-CLI to read that file and create new create the invite code posts:
+
+```
+$ while IFS=, read -r code; do wp post create --post_type=invite_codes --post_title=$code --post_status=publish; done < codes.txt
+Success: Created post 27217.
+Success: Created post 27218.
+Success: Created post 27219.
+```
+
+Note that this method does not take into consideration duplicate codes.
