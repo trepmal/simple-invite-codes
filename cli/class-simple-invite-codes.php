@@ -35,8 +35,22 @@ class Simple_Invite_Codes extends WP_CLI_Command {
 		$chars = WP_CLI\Utils\get_flag_value( $assoc_args, 'chars', 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789' );
 		$length = absint( WP_CLI\Utils\get_flag_value( $assoc_args, 'length', 6 ) );
 
+		$skips = 0;
 		for ( $i=1; $i<=$count; $i++ ) {
 			$invite_code = $this->generate_code( $chars, $length );
+
+			$is_valid_code = get_page_by_title( $invite_code, OBJECT, 'invite_codes' );
+
+			if ( ! is_null( $is_valid_code ) ) {
+				$skips++;
+
+				if ( $skips >= 50 ) {
+					WP_CLI::error( "Oops. A lot of duplicates are being created, which may mean the character set or length are not broad enough to create enough unique codes. Please try again with different values." );
+				}
+
+				continue;
+			}
+
 			$id = wp_insert_post( array(
 				'post_type'   => 'invite_codes',
 				'post_title'  => $invite_code,
