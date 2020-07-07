@@ -103,6 +103,10 @@ add_action( 'register_post', 'ic_add_register_field_validate', 10, 3 );
  * @return array An array of slashed post data.
  */
 function ic_mark_duplicate_titles( $data, $postarr ) {
+	if ( 'invite_codes' !== $data['post_type'] ) {
+		return $data;
+	}
+
 	$title = $data['post_title'];
 	$code_exists = get_page_by_title( $title, OBJECT, 'invite_codes' );
 	if ( $code_exists ) {
